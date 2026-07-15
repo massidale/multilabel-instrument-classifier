@@ -47,4 +47,6 @@ def aggregate_scores(window_scores: torch.Tensor, method: str = "mean") -> torch
         return window_scores.mean(dim=0)
     if method == "max":
         return window_scores.amax(dim=0)
+    if method == "p90":  # 90th-percentile: duration-adaptive "soft max", robust to lone spikes
+        return torch.quantile(window_scores, 0.9, dim=0)
     raise ValueError(f"unknown aggregation method: {method!r}")

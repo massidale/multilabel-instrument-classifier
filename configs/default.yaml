@@ -54,5 +54,5 @@ train:
 eval:
   window_seconds: 3.0
   hop_seconds: 1.0
-  aggregate: mean                    # mean | max
+  aggregate: p90                     # mean | max | p90 (90th-percentile pooling)
   default_threshold: 0.5
