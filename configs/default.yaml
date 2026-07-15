@@ -1,0 +1,58 @@
+# ---------------------------------------------------------------------------
+# MultiBranchNet on IRMAS — every hyperparameter lives here.
+# ---------------------------------------------------------------------------
+seed: 42
+device: auto          # auto | cpu | cuda | mps
+output_dir: outputs
+
+data:
+  train_dir: data/IRMAS-TrainingData
+  test_dir: data/IRMAS-TestingData
+  features_dir: data/features        # output of scripts/preprocess.py
+  val_fraction: 0.15
+  num_workers: 2
+
+features:                            # shared by preprocessing AND eval
+  sample_rate: 22050
+  clip_seconds: 3.0
+  n_fft: 2048
+  hop_length: 512
+  n_mels: 128
+  cqt_bins: 84                       # 7 octaves x 12 bins
+
+branches:                            # the ablation axis: toggle freely
+  mel: true
+  cqt: true
+  wave: true
+  chroma: true
+
+model:
+  num_classes: 11
+  pretrained: true                   # ImageNet weights for mel/CQT ResNet18
+  head_hidden: 512
+  dropout: 0.3
+
+augment:
+  specaugment:
+    enabled: true
+    time_masks: 2
+    time_width: 20                   # frames
+    freq_masks: 2
+    freq_width: 12                   # bins
+  mixup_alpha: 0.4                   # 0 disables
+
+train:
+  batch_size: 32
+  warmup_epochs: 3                   # backbones frozen
+  warmup_lr: 1.0e-3
+  finetune_epochs: 25
+  head_lr: 5.0e-4
+  backbone_lr: 5.0e-5
+  weight_decay: 1.0e-4
+  early_stopping_patience: 6
+
+eval:
+  window_seconds: 3.0
+  hop_seconds: 1.0
+  aggregate: mean                    # mean | max
+  default_threshold: 0.5
